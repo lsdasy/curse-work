@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Редактор Курса - Администратор</title>
+    <link rel="stylesheet" href="course-editor.css">
+</head>
+<body>
+    <div class="editor-container">
+        <!-- Левая панель -->
+        <div class="left-panel">
+            <div class="panel-header">
+                <button class="btn-back" onclick="goBackToAdmin()">← Назад</button>
+            </div>
+
+            <div class="course-form">
+                <h2>Информация о курсе</h2>
+                
+                <div class="form-group">
+                    <label>Название курса</label>
+                    <input type="text" id="course-title" placeholder="Введите название" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label>Описание курса</label>
+                    <textarea id="course-description" placeholder="Введите описание" class="form-textarea"></textarea>
+                </div>
+
+                <button class="btn btn-success" onclick="saveCourse()" style="width: 100%;">
+                    💾 Сохранить курс
+                </button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="lessons-section">
+                <h3>Уроки</h3>
+                <div id="lessons-list" class="lessons-list">
+                    <div class="loading" style="text-align: center; padding: 20px; color: var(--text-muted);">
+                        Загрузка уроков...
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addNewLesson()" style="width: 100%; margin-top: 10px;">
+                    + Добавить урок
+                </button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="lessons-section">
+                <h3>Программные Задачи</h3>
+                <div id="tasks-list" class="lessons-list">
+                    <div class="loading" style="text-align: center; padding: 20px; color: var(--text-muted);">
+                        Загрузка задач...
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="addNewTask()" style="width: 100%; margin-top: 10px;">
+                    + Добавить задачу
+                </button>
+            </div>
+        </div>
+
+        <!-- Правая панель -->
+        <div class="right-panel">
+            <div id="empty-state" class="empty-state">
+                <div class="empty-icon">📚</div>
+                <div class="empty-text">Выберите урок слева, чтобы редактировать</div>
+            </div>
+
+            <div id="lesson-editor" class="lesson-editor" style="display: none;">
+                <div class="section">
+                    <h2>Редактирование урока</h2>
+                    
+                    <div class="form-group">
+                        <label>Название урока</label>
+                        <input type="text" id="lesson-title" placeholder="Введите название урока" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Содержимое урока</label>
+                        <textarea id="lesson-content" placeholder="Введите содержимое урока (поддерживается HTML)" class="form-textarea large"></textarea>
+                        <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                            Поддерживаются базовые HTML теги: &lt;p&gt;, &lt;h2&gt;, &lt;h3&gt;, &lt;ul&gt;, &lt;ol&gt;, &lt;li&gt;, &lt;code&gt;, &lt;pre&gt;, &lt;strong&gt;, &lt;em&gt;
+                        </small>
+                    </div>
+
+                    <button class="btn btn-success" onclick="saveLesson()" style="width: 100%;">
+                        💾 Сохранить урок
+                    </button>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="section">
+                    <h2>Вопросы к уроку</h2>
+
+                    <div id="questions-list" class="questions-list">
+                        <div class="loading" style="text-align: center; padding: 20px; color: var(--text-muted);">
+                            Нет вопросов
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="toggleQuestionForm()" style="width: 100%; margin-top: 10px;">
+                        + Добавить вопрос
+                    </button>
+
+                    <!-- Форма добавления вопроса -->
+                    <div id="question-form" class="question-form" style="display: none;">
+                        <h3>Новый вопрос</h3>
+
+                        <div class="form-group">
+                            <label>Текст вопроса</label>
+                            <textarea id="question-text" placeholder="Введите текст вопроса" class="form-textarea"></textarea>
+                        </div>
+
+                        <div class="options-grid">
+                            <div class="form-group">
+                                <label>Вариант A</label>
+                                <input type="text" id="option-a" placeholder="Вариант A" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Вариант B</label>
+                                <input type="text" id="option-b" placeholder="Вариант B" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Вариант C</label>
+                                <input type="text" id="option-c" placeholder="Вариант C" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Вариант D</label>
+                                <input type="text" id="option-d" placeholder="Вариант D" class="form-input">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Правильный вариант ответа</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="correct-option" value="1">
+                                    Вариант A (1)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="correct-option" value="2">
+                                    Вариант B (2)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="correct-option" value="3">
+                                    Вариант C (3)
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="correct-option" value="4">
+                                    Вариант D (4)
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Объяснение (необязательно)</label>
+                            <textarea id="question-explanation" placeholder="Объяснение ответа" class="form-textarea"></textarea>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-success" onclick="saveNewQuestion()" style="flex: 1;">
+                                ✓ Сохранить вопрос
+                            </button>
+                            <button class="btn" onclick="toggleQuestionForm()" style="flex: 1; background: var(--text-muted);">
+                                ✕ Отмена
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="task-editor" class="lesson-editor" style="display: none;">
+                <div class="section">
+                    <h2>Редактирование задачи</h2>
+                    
+                    <div class="form-group">
+                        <label>Название задачи</label>
+                        <input type="text" id="task-title" placeholder="Введите название задачи" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Описание задачи</label>
+                        <textarea id="task-description" placeholder="Введите описание задачи" class="form-textarea large"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Язык программирования</label>
+                        <select id="task-language" class="form-input">
+                            <option value="">-- Выберите язык --</option>
+                            <option value="54">C++</option>
+                            <option value="71">Python</option>
+                            <option value="63">JavaScript</option>
+                            <option value="60">Go</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-success" onclick="saveTask()" style="width: 100%;">
+                        💾 Сохранить задачу
+                    </button>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="section">
+                    <h2>Тест-кейсы</h2>
+
+                    <div id="testcases-list" class="questions-list">
+                        <div class="loading" style="text-align: center; padding: 20px; color: var(--text-muted);">
+                            Нет тест-кейсов
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="toggleTestCaseForm()" style="width: 100%; margin-top: 10px;">
+                        + Добавить тест-кейс
+                    </button>
+
+                    <!-- Форма добавления тест-кейса -->
+                    <div id="testcase-form" class="question-form" style="display: none;">
+                        <h3>Новый тест-кейс</h3>
+
+                        <div class="form-group">
+                            <label>Тип проверки</label>
+                            <label class="radio-label">
+                                <input type="radio" name="test-check-type" value="output" checked onchange="onTestCheckTypeChange(this.value)">
+                                По выводу
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="test-check-type" value="code_test" onchange="onTestCheckTypeChange(this.value)">
+                                По коду
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Ввод (stdin)</label>
+                            <textarea id="testcase-input" placeholder="Входные данные для задачи" class="form-textarea"></textarea>
+                        </div>
+
+                        <div class="form-group" id="testcase-output-block">
+                            <label>Ожидаемый вывод</label>
+                            <textarea id="testcase-output" placeholder="Ожидаемый stdout" class="form-textarea"></textarea>
+                        </div>
+
+                        <div class="form-group" id="testcase-code-block" style="display: none;">
+                            <label>Проверочный код</label>
+                            <textarea id="testcase-code" placeholder="assert код для проверки" class="form-textarea"></textarea>
+                            <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                                Python: assert x == 5, &quot;сообщение&quot;; print('OK')<br>
+                                Go: if x != 5 { panic(...) }; fmt.Println('OK')<br>
+                                JS: if (x !== 5) throw new Error(...); console.log('OK')
+                            </small>
+                        </div>
+
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-success" onclick="saveNewTestCase()" style="flex: 1;">
+                                ✓ Сохранить тест
+                            </button>
+                            <button class="btn" onclick="toggleTestCaseForm()" style="flex: 1; background: var(--text-muted);">
+                                ✕ Отмена
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="section">
+                    <h2>💻 Тестирование кода задачи</h2>
+
+                    <div class="form-group">
+                        <label>Пример кода для тестирования</label>
+                        <textarea id="compiler-code" placeholder="Напишите код для тестирования..." class="form-textarea large" style="font-family: monospace; font-size: 12px;"></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn btn-success" onclick="runCompilerCode()" style="flex: 1;">
+                            ▶️ Запустить код
+                        </button>
+                        <button class="btn" onclick="clearCompilerCode()" style="flex: 1;">
+                            🔄 Очистить
+                        </button>
+                    </div>
+
+                    <div id="compiler-output" class="compile-output-box" style="display: none;">
+                        <div class="status" id="compiler-status">Выполнение...</div>
+                        <pre id="compiler-output-text"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast уведомления -->
+    <div id="toast" class="toast"></div>
+
+    <script src="course-editor.js"></script>
+    <script src="course-editor-tasks.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр Курса - Корпоративная Система Обучения</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ext-language_tools.js"></script>
+    <link rel="stylesheet" href="course.css">
+</head>
+<body>
+    <header class="header">
+        <h1>🎓 Просмотр Курса</h1>
+    </header>
+
+    <div class="course-container">
+        <!-- Left Sidebar -->
+        <aside class="course-sidebar">
+            <div class="sidebar-header">
+                <h2 id="course-title-sidebar">Загрузка...</h2>
+                <div class="progress-section">
+                    <div class="progress-label">Прогресс</div>
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+                    </div>
+                    <div id="progress-text" class="progress-text">0/0 уроков</div>
+                </div>
+            </div>
+
+            <div class="lessons-list">
+                <div class="loading">Загрузка уроков...</div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button class="complete-btn" id="complete-btn" onclick="completeCourse()" disabled>
+                    ✓ Завершить курс
+                </button>
+            </div>
+        </aside>
+
+        <!-- Right Content Area -->
+        <main class="course-content">
+            <div class="lesson-view">
+                <div class="lesson-header">
+                    <h1 id="lesson-title">Выберите урок</h1>
+                    <div class="lesson-meta">
+                        <span id="lesson-number" class="lesson-number"></span>
+                        <span id="lesson-status" class="lesson-status"></span>
+                    </div>
+                </div>
+
+                <div class="lesson-body">
+                    <div id="lesson-content" class="lesson-content">
+                        <div class="placeholder">Содержимое урока будет отображаться здесь</div>
+                    </div>
+
+                    <!-- Questions/Quiz Section -->
+                    <div id="questions-section" class="questions-section" style="display: none;">
+                        <h2>Проверка знаний</h2>
+                        <div id="questions-container" class="questions-container">
+                            <!-- Questions will be loaded here -->
+                        </div>
+                    </div>
+
+                    <!-- Programming Tasks Section -->
+                    <div id="course-tasks-section" class="questions-section" style="margin-top: 1rem;">
+                        <h2>Программные задачи курса</h2>
+                        <div id="course-tasks" class="questions-container">
+                            <div class="empty-state">Загрузка задач курса...</div>
+                        </div>
+
+                        <div id="task-runner" class="task-runner" style="display: none;">
+                            <div class="task-runner-header">
+                                <h3 class="task-runner-title" id="task-runner-title">Задача</h3>
+                                <p class="task-runner-desc" id="task-runner-desc"></p>
+                            </div>
+                            <div class="code-editor-section">
+                                <div class="code-editor-header">
+                                    <div class="code-editor-tabs">
+                                        <div class="code-tab active" data-language="javascript">
+                                            <span class="tab-icon">📄</span>
+                                            <span class="tab-title">solution.js</span>
+                                            <span class="tab-close">×</span>
+                                        </div>
+                                    </div>
+                                    <div class="code-editor-actions">
+                                        <select class="language-selector" id="language-selector">
+                                            <option value="javascript">JavaScript</option>
+                                            <option value="python">Python</option>
+                                            <option value="java">Java</option>
+                                            <option value="cpp">C++</option>
+                                            <option value="go">Go</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="code-editor-container">
+                                    <div id="code-editor" class="code-editor"></div>
+                                </div>
+                            </div>
+                            <div class="compiler-controls">
+                                <button class="btn-compile" onclick="compileCourseTask()">
+                                    <span>▶</span> Компилировать
+                                </button>
+                                <div class="compile-status" id="task-compile-status"></div>
+                            </div>
+                            <div id="task-output" class="output-panel empty">Результат выполнения появится здесь...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lesson-footer">
+                    <button class="nav-btn prev-btn" id="prev-lesson-btn" onclick="loadPreviousLesson()" disabled>
+                        ← Предыдущий урок
+                    </button>
+                    <button class="nav-btn next-btn" id="next-lesson-btn" onclick="loadNextLesson()" disabled>
+                        Следующий урок →
+                    </button>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state" style="display: none;">
+                <div class="empty-icon">📚</div>
+                <div class="empty-text">Выберите урок из списка слева, чтобы начать обучение</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="course.js"></script>
+</body>
+</html>

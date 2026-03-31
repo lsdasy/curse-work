@@ -1,0 +1,20 @@
+# Ignore environment files
+.env
+
+# Ignore compiled binaries
+*.exe
+*.out
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+
+# Node modules if any
+node_modules/

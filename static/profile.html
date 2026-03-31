@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мой Профиль - Корпоративная Система Обучения</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="courses.css">
+</head>
+<body>
+    <header class="header">
+        <h1>🎓 Личный Кабинет Обучения</h1>
+        <div class="user-info">
+            <span id="user-role">Сотрудник</span>
+            <button class="logout-btn" onclick="logout()">Выйти</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="dashboard">
+            <div class="card">
+                <h2>📊 Прогресс Обучения</h2>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🏆 Пройденный материал</h2>
+                <div id="performance-summary">
+                    <div class="loading">Загрузка...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- sections grid for courses, tasks, questions, results -->
+        <div class="sections-grid">
+            <div class="card" id="courses-section">
+                <h2>📚 Доступные Курсы</h2>
+                <div id="courses-list" class="courses-list">
+                    <div class="loading">Загрузка курсов...</div>
+                </div>
+            </div>
+
+            <div class="card" id="results-section">
+                <h2>✓ Мои Результаты</h2>
+                <div id="results-list" class="courses-list">
+                    <div class="loading">Загрузка результатов...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="profile.js"></script>
+</body>
+</html>

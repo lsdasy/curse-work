@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель Администратора - Корпоративная Система Обучения</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <header class="header">
+        <h1>🛡️ Панель Администратора</h1>
+        <div class="user-info">
+            <span>Администратор</span>
+            <button class="logout-btn" onclick="logout()">Выйти</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Tabs Navigation -->
+        <nav class="tabs" role="navigation">
+            <button id="tab-courses" class="tab-btn active" onclick="switchTab('courses')">
+                📚 Курсы
+            </button>
+            <button id="tab-tasks" class="tab-btn" onclick="switchTab('tasks')">
+                🧩 Задачи
+            </button>
+        </nav>
+
+        <!-- COURSES TAB -->
+        <div id="courses-tab" class="tab-content" style="display: block;">
+            <!-- Statistics Cards -->
+            <div class="stats-grid" id="stats-container">
+                <div class="loading">Загрузка статистики...</div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📊 Аналитика Системы</h2>
+                </div>
+                <div class="analytics-grid">
+                    <div>
+                        <h3>Статус Прохождения Курсов</h3>
+                        <div style="height: 250px; margin-top: 1rem;">
+                            <canvas id="completionChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h3>Обзор Производительности</h3>
+                        <div style="height: 250px; margin-top: 1rem;">
+                            <canvas id="performanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Courses Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>📚 Управление Курсами</h2>
+                    <button class="btn btn-success" onclick="window.location.href='course-editor.html?id=new'">+ Создать Новый Курс</button>
+                </div>
+                <div id="courses-list" class="courses-list">
+                    <div class="loading">Загрузка курсов...</div>
+                </div>
+            </div>
+
+            <!-- Selected Course Details & Lessons Management -->
+            <div id="course-details" class="card" style="display: none;">
+                <div class="card-header">
+                    <h2 id="selected-course-title">Уроки курса</h2>
+                    <button class="btn btn-success" onclick="openLessonModal()">📖 Добавить Урок</button>
+                </div>
+                <div id="lessons-list" class="courses-list">
+                    <div class="loading">Загрузка уроков...</div>
+                </div>
+                <button class="btn" onclick="backToCoursesList()" style="margin-top: 1rem;">← Вернуться к курсам</button>
+            </div>
+
+            <!-- Users Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>👥 Управление Пользователями</h2>
+                </div>
+                <div id="users-list" class="users-list">
+                    <div class="loading">Загрузка пользователей...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TASKS TAB -->
+        <div id="tasks-tab" class="tab-content" style="display: none;">
+            <!-- Tasks Management -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>🧩 Управление Задачами</h2>
+                    <button class="btn btn-success" onclick="openTaskModal()">Добавить Задачу</button>
+                </div>
+                <div id="tasks-list" class="courses-list">
+                    <div class="loading">Загрузка задач...</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <!-- Course Modal -->
+    <div id="course-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCourseModal()">&times;</span>
+            <h2 id="modal-title">Добавить Новый Курс</h2>
+            <form id="course-form">
+                <input type="hidden" id="course-id">
+                <div class="form-group">
+                    <label for="course-title">Название Курса *</label>
+                    <input type="text" id="course-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="course-description">Описание</label>
+                    <textarea id="course-description"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-success">Сохранить Курс</button>
+                    <button type="button" class="btn" onclick="closeCourseModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Task Modal -->
+    <div id="task-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTaskModal()">&times;</span>
+            <h2 id="task-modal-title">Добавить Задачу</h2>
+            <form id="task-form" onsubmit="event.preventDefault(); saveTask();">
+                <input type="hidden" id="task-id">
+                <div class="form-group">
+                    <label for="task-course">Курс *</label>
+                    <select id="task-course" required>
+                        <option value="">-- Выберите курс --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-title">Название Задачи *</label>
+                    <input type="text" id="task-title" required>
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Описание</label>
+                    <textarea id="task-description"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-language">Язык Программирования *</label>
+                    <select id="task-language" required>
+                        <option value="">-- Выберите язык --</option>
+                        <option value="54">C++</option>
+                        <option value="62">Java</option>
+                        <option value="71">Python</option>
+                        <option value="93">JavaScript</option>
+                        <option value="95">Go</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-success">Сохранить Задачу</button>
+                    <button type="button" class="btn" onclick="closeTaskModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Test Case Modal -->
+    <div id="test-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeTestModal()">&times;</span>
+            <h2 id="test-modal-title">Добавить Тест</h2>
+            <form id="test-form" onsubmit="event.preventDefault(); saveTestCase();">
+                <input type="hidden" id="test-task-id">
+                <div class="form-group">
+                    <label>Тип проверки</label>
+                    <label><input type="radio" name="test-check-type" value="output" checked onchange="onTestCheckTypeChange(this.value)"> По выводу</label>
+                    <label><input type="radio" name="test-check-type" value="code_test" onchange="onTestCheckTypeChange(this.value)"> По коду</label>
+                </div>
+                <div class="form-group">
+                    <label for="test-input">Ввод (stdin)</label>
+                    <textarea id="test-input"></textarea>
+                </div>
+                <div class="form-group" id="test-output-block">
+                    <label for="test-output">Ожидаемый вывод</label>
+                    <textarea id="test-output"></textarea>
+                </div>
+                <div class="form-group" id="test-code-block" style="display: none;">
+                    <label for="test-code">Проверочный код (test_code)</label>
+                    <textarea id="test-code" placeholder="Python:
+assert 'x' in dir(), 'Переменная x не объявлена'
+assert x == 5, f'Ожидалось 5, получено {x}'
+print('OK')
+
+Go:
+// __TEST_START__\nif x != 5 { panic('x должна равняться 5') }\nfmt.Println('OK')
+
+JavaScript:
+if (typeof x === 'undefined') throw new Error('Переменная x не объявлена')
+if (x !== 5) throw new Error(`x должна равняться 5, получено: ${x}`)
+console.log('OK')"></textarea>
+                    <small>Для code_test это код, который добавляется в конец пользователя: user_code + "\n" + test_code. Для Go test_code будет вставляться внутрь func main().</small>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-success">Сохранить Тест</button>
+                    <button type="button" class="btn" onclick="closeTestModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Question Modal (Quiz) -->
+    <div id="question-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeQuestionModal()">&times;</span>
+            <h2>Добавить Вопрос</h2>
+            <form id="question-form" onsubmit="event.preventDefault(); saveQuestionQuiz();">
+                <input type="hidden" id="question-id">
+                <div class="form-group">
+                    <label for="question-course">Курс *</label>
+                    <select id="question-course" required>
+                        <option value="">-- Выберите курс --</option>
+                    </select>
+                </div>
+                <!-- Удалено поле выбора урока -->
+                <div class="form-group">
+                    <label for="question-text">Текст вопроса *</label>
+                    <textarea id="question-text" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="question-options">Варианты ответов (один на строку) *</label>
+                    <textarea id="question-options" placeholder="Вариант 1&#10;Вариант 2&#10;Вариант 3" required style="height: 120px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="question-correct">Номер правильного варианта (1, 2, 3...) *</label>
+                    <input type="number" id="question-correct" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="question-explanation">Объяснение (опционально)</label>
+                    <textarea id="question-explanation"></textarea>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-success">Сохранить Вопрос</button>
+                    <button type="button" class="btn" onclick="closeQuestionModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lesson Modal for CRUD Operations -->
+    <div id="lesson-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLessonModal()">&times;</span>
+            <h2 id="lesson-modal-title">Добавить Урок</h2>
+            <form id="lesson-form" onsubmit="event.preventDefault(); saveLesson();">
+                <input type="hidden" id="lesson-id">
+                <div class="form-group">
+                    <label for="lesson-title-input">Название Урока *</label>
+                    <input type="text" id="lesson-title-input" placeholder="Введите название урока" required>
+                </div>
+                <div class="form-group">
+                    <label for="lesson-content-input">Содержание Урока (HTML) *</label>
+                    <textarea id="lesson-content-input" placeholder="Введите содержание урока" required style="min-height: 150px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="lesson-order-input">Порядок Урока *</label>
+                    <input type="number" id="lesson-order-input" min="1" placeholder="1" required>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button type="submit" class="btn btn-success">Сохранить Урок</button>
+                    <button type="button" class="btn" onclick="closeLessonModal()">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
